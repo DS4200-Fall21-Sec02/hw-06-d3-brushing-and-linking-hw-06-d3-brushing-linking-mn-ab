@@ -12,6 +12,13 @@ var svg1 = d3
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 //TODO: append svg object to the body of the page to house Scatterplot 2
+var svg2 = d3
+  .select("#dataviz_brushScatter")
+  .append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 //TODO: append svg object to the body of the page to house Bar chart 
 
@@ -86,13 +93,90 @@ d3.csv("data/iris.csv").then((data) => {
       })
       .style("opacity", 0.5);
 
+    //TODO: Define a brush  
+
+    var brush = d3.brushX()
+    .extent([[0, 0], [width, height]])
+    .on("start brush end", brushmoved);
+
+    
+
+    //TODO: Add brush to the svg
+    svg1.append("g")
+    .attr('class', 'brush')
+    .call(brush);
+    
+  }
+
+  //TODO: Scatterplot 2 (show Sepal width on x-axis and Petal width on y-axis)
+
+  {
+    var xKey1 = "Sepal_Width";
+    var yKey1 = "Petal_Width";
+
+    //Add X axis
+    var x1 = d3
+      .scaleLinear()
+      .domain(d3.extent(data.map((val) => val[xKey1])))
+      .range([0, width]);
+    svg2
+      .append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x1))
+      .call((g) =>
+        g
+          .append("text")
+          .attr("x", width)
+          .attr("y", margin.bottom - 4)
+          .attr("fill", "currentColor")
+          .attr("text-anchor", "end")
+          .text(xKey1)
+      );
+
+    //Add Y axis
+    var y1 = d3
+      .scaleLinear()
+      .domain(d3.extent(data.map((val) => val[yKey1])))
+      .range([height, 0]);
+    svg2
+      .append("g")
+      .call(d3.axisLeft(y1))
+      .call((g) =>
+        g
+          .append("text")
+          .attr("x", -margin.left)
+          .attr("y", 10)
+          .attr("fill", "currentColor")
+          .attr("text-anchor", "start")
+          .text(yKey1)
+      );
+
+    // Add dots
+    var myCircle1 = svg2
+      .append("g")
+      .selectAll("circle")
+      .data(data)
+      .enter()
+      .append("circle")
+      .attr("id", (d) => d.id)
+      .attr("cx", function (d) {
+        return x1(d[xKey1]);
+      })
+      .attr("cy", function (d) {
+        return y1(d[yKey1]);
+      })
+      .attr("r", 8)
+      .style("fill", function (d) {
+        return color(d.Species);
+      })
+      .style("opacity", 0.5);
+
     //TODO: Define a brush
 
     //TODO: Add brush to the svg
     
   }
-
-  //TODO: Scatterplot 2 (show Sepal width on x-axis and Petal width on y-axis)
+  
 
   //TODO: Barchart with counts of different species
 
