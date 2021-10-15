@@ -101,11 +101,32 @@ d3.csv("data/iris.csv").then((data) => {
       })
       .style("opacity", 0.5);
 
-    //TODO: Define a brush
+    //TODO: Define a brush  
+
+    var brush = d3.brush()
+    .extent([[0, 0], [width+10, height+10]])
+    .on("start brush end", brushed);
+
+    function brushed({selection}) {
+      if (selection === null) {
+        myCircle1.attr("stroke", null);
+      } else {
+        const [[x0, y0], [x1, y1]] = selection;
+        myCircle1.attr("stroke", ([x, y]) => {
+          return x0 <= x && x <= x1
+              && y0 <= y && y <= y1
+              ? "magenta" : null;
+        });
+      }
+    }
+
 
     //TODO: Add brush to the svg
+    svg1.append("g")
+    .attr('class', 'brush')
+    .call(brush);   
     
-  }
+    }
 
   //TODO: Scatterplot 2 (show Sepal width on x-axis and Petal width on y-axis)
 
@@ -170,11 +191,32 @@ d3.csv("data/iris.csv").then((data) => {
       })
       .style("opacity", 0.5);
 
-    //TODO: Define a brush
+    //TODO: Define a brush  
+
+    var brush = d3.brush()
+    .extent([[0, 0], [width+10, height+10]])
+    .on("start brush end", brushed);
+
+    function brushed({selection}) {
+      if (selection === null) {
+        myCircle1.attr("stroke", null);
+      } else {
+        const [[x0, y0], [x1, y1]] = selection;
+        myCircle1.attr("stroke", ([x, y]) => {
+          return x0 <= x && x <= x1
+              && y0 <= y && y <= y1
+              ? "magenta" : null;
+        });
+      }
+    }
+
 
     //TODO: Add brush to the svg
+    svg1.append("g")
+    .attr('class', 'brush')
+    .call(brush);   
     
-  }
+    }
   
 
   //TODO: Barchart with counts of different species
@@ -209,7 +251,6 @@ d3.csv("data/iris.csv").then((data) => {
           .attr("width", xScale.bandwidth())
           .style("fill", color(species[i]));
     }
-
 
 
     //TODO: Define a brush
