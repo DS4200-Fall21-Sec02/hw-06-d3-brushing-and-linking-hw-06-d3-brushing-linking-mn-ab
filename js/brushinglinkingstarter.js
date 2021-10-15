@@ -22,6 +22,14 @@ var svg2 = d3
 
 //TODO: append svg object to the body of the page to house Bar chart 
 
+var svg3 = d3
+  .select("#dataviz_brushScatter")
+  .append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
 // Define color scale
 var color = d3
   .scaleOrdinal()
@@ -93,18 +101,9 @@ d3.csv("data/iris.csv").then((data) => {
       })
       .style("opacity", 0.5);
 
-    //TODO: Define a brush  
-
-    var brush = d3.brushX()
-    .extent([[0, 0], [width, height]])
-    .on("start brush end", brushmoved);
-
-    
+    //TODO: Define a brush
 
     //TODO: Add brush to the svg
-    svg1.append("g")
-    .attr('class', 'brush')
-    .call(brush);
     
   }
 
@@ -179,6 +178,45 @@ d3.csv("data/iris.csv").then((data) => {
   
 
   //TODO: Barchart with counts of different species
+
+  {
+    //Add X axis
+    var xScale = d3.scaleBand()
+                    .range([0, width])
+                    .domain(data.map(d => d.Species))
+                    .padding(.2)
+    var xAxis = d3.axisBottom(xScale);
+    svg3.append("g")
+      .attr("transform", `translate(0,${height})`)
+      .call(xAxis);
+
+
+    //Add Y axis
+    var yScale = d3.scaleLinear()
+                .domain([0,50])
+                .range([height, 0]);
+    var yAxis = d3.axisLeft(yScale);
+    svg3.append("g")
+      .call(yAxis);
+
+    let species = [... new Set(data.map(d => d.Species))]; //https://stackoverflow.com/a/42123984
+    for (let i=0; i<species.length; i++) {
+      let numSpecies = data.filter(d => d.Species===species[i]).length;
+      svg3.append("rect")
+          .attr("x", xScale(species[i]))
+          .attr("y", d => yScale(numSpecies))
+          .attr("height", d => yScale(0) - yScale(numSpecies))
+          .attr("width", xScale.bandwidth())
+          .style("fill", color(species[i]));
+    }
+
+
+
+    //TODO: Define a brush
+
+    //TODO: Add brush to the svg
+    
+  }
 
   //Brushing Code---------------------------------------------------------------------------------------------
     
