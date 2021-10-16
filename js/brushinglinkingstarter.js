@@ -103,46 +103,31 @@ d3.csv("data/iris.csv").then((data) => {
 
     //TODO: Define a brush  
 
-    var brush = d3.brush()
-    .extent([[0, 0], [width+10, height+10]])
-    .on("start brush end", brushed);
+     let brush1 = d3.brush()                     // Add the brush feature using the d3.brush function
+      .extent( [ [0,0], [width,height] ] )      // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+      .on("start brush", (e, d) => updateChart1(e))
 
-    function brushed({selection}) {
-      if (selection === null) {
-        myCircle1.attr("stroke", null);
-      } else {
-        const [[x0, y0], [x1, y1]] = selection;
-        myCircle1.attr("stroke", ([x, y]) => {
-          return x0 <= x && x <= x1
-              && y0 <= y && y <= y1
-              ? "magenta" : null;
-        });
-      }
-    }
-
-
-    //TODO: Add brush to the svg
-    svg1.append("g")
-    .attr('class', 'brush')
-    .call(brush);   
+    //TODO: Add brush to the svg  
     
+    svg1.call(brush1)
+
     }
 
   //TODO: Scatterplot 2 (show Sepal width on x-axis and Petal width on y-axis)
 
   {
-    var xKey1 = "Sepal_Width";
-    var yKey1 = "Petal_Width";
+    var xKey2 = "Sepal_Width";
+    var yKey2 = "Petal_Width";
 
     //Add X axis
-    var x1 = d3
+    var x2 = d3
       .scaleLinear()
-      .domain(d3.extent(data.map((val) => val[xKey1])))
+      .domain(d3.extent(data.map((val) => val[xKey2])))
       .range([0, width]);
     svg2
       .append("g")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x1))
+      .call(d3.axisBottom(x2))
       .call((g) =>
         g
           .append("text")
@@ -150,17 +135,17 @@ d3.csv("data/iris.csv").then((data) => {
           .attr("y", margin.bottom - 4)
           .attr("fill", "currentColor")
           .attr("text-anchor", "end")
-          .text(xKey1)
+          .text(xKey2)
       );
 
     //Add Y axis
-    var y1 = d3
+    var y2 = d3
       .scaleLinear()
-      .domain(d3.extent(data.map((val) => val[yKey1])))
+      .domain(d3.extent(data.map((val) => val[yKey2])))
       .range([height, 0]);
     svg2
       .append("g")
-      .call(d3.axisLeft(y1))
+      .call(d3.axisLeft(y2))
       .call((g) =>
         g
           .append("text")
@@ -168,11 +153,11 @@ d3.csv("data/iris.csv").then((data) => {
           .attr("y", 10)
           .attr("fill", "currentColor")
           .attr("text-anchor", "start")
-          .text(yKey1)
+          .text(yKey2)
       );
 
     // Add dots
-    var myCircle1 = svg2
+    var myCircle2 = svg2
       .append("g")
       .selectAll("circle")
       .data(data)
@@ -180,10 +165,10 @@ d3.csv("data/iris.csv").then((data) => {
       .append("circle")
       .attr("id", (d) => d.id)
       .attr("cx", function (d) {
-        return x1(d[xKey1]);
+        return x2(d[xKey2]);
       })
       .attr("cy", function (d) {
-        return y1(d[yKey1]);
+        return y2(d[yKey2]);
       })
       .attr("r", 8)
       .style("fill", function (d) {
@@ -193,28 +178,13 @@ d3.csv("data/iris.csv").then((data) => {
 
     //TODO: Define a brush  
 
-    var brush = d3.brush()
-    .extent([[0, 0], [width+10, height+10]])
-    .on("start brush end", brushed);
-
-    function brushed({selection}) {
-      if (selection === null) {
-        myCircle1.attr("stroke", null);
-      } else {
-        const [[x0, y0], [x1, y1]] = selection;
-        myCircle1.attr("stroke", ([x, y]) => {
-          return x0 <= x && x <= x1
-              && y0 <= y && y <= y1
-              ? "magenta" : null;
-        });
-      }
-    }
-
+    let brush2 = d3.brush()                     // Add the brush feature using the d3.brush function
+      .extent( [ [0,0], [width,height] ] )      // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+      .on("start brush", (e, d) => updateChart2(e))
 
     //TODO: Add brush to the svg
-    svg1.append("g")
-    .attr('class', 'brush')
-    .call(brush);   
+
+    svg2.call(brush2)
     
     }
   
@@ -225,7 +195,7 @@ d3.csv("data/iris.csv").then((data) => {
     //Add X axis
     var xScale = d3.scaleBand()
                     .range([0, width])
-                    .domain(data.map(d => d.Species))
+                    .domain(data.map(d => d.Species)) //array of all possible species values
                     .padding(.2)
     var xAxis = d3.axisBottom(xScale);
     svg3.append("g")
@@ -235,28 +205,32 @@ d3.csv("data/iris.csv").then((data) => {
 
     //Add Y axis
     var yScale = d3.scaleLinear()
-                .domain([0,50])
+                .domain([0,50]) //dataset contains 50 measurements of each species
                 .range([height, 0]);
     var yAxis = d3.axisLeft(yScale);
     svg3.append("g")
       .call(yAxis);
 
     let species = [... new Set(data.map(d => d.Species))]; //https://stackoverflow.com/a/42123984
+    let speciesData = []
     for (let i=0; i<species.length; i++) {
       let numSpecies = data.filter(d => d.Species===species[i]).length;
-      svg3.append("rect")
-          .attr("x", xScale(species[i]))
-          .attr("y", d => yScale(numSpecies))
-          .attr("height", d => yScale(0) - yScale(numSpecies))
-          .attr("width", xScale.bandwidth())
-          .style("fill", color(species[i]));
+      speciesData.push({"Species": species[i], "Quantity": numSpecies})
     }
+    console.log(speciesData)
 
-
-    //TODO: Define a brush
-
-    //TODO: Add brush to the svg
-    
+    var myBar = svg3
+      .append("g")
+      .selectAll("rect")
+      .data(speciesData)
+      .enter()
+      .append("rect")
+      .attr("id", d => d.Species)
+      .attr("x", d => xScale(d.Species))
+      .attr("y", d => yScale(d.Quantity))
+      .attr("height", d => yScale(0) - yScale(d.Quantity))
+      .attr("width", xScale.bandwidth())
+      .style("fill", d => color(d.Species));
   }
 
   //Brushing Code---------------------------------------------------------------------------------------------
@@ -272,23 +246,25 @@ d3.csv("data/iris.csv").then((data) => {
         extent = brushEvent.selection;
     
         //TODO: Check all the circles that are within the brush region in Scatterplot 1
- 
+        myCircle1.classed("selected", function(d){ return isBrushed(extent, x1(d[xKey1]), y1(d[yKey1]) ) } )
     
         //TODO: Select all the data points in Scatterplot 2 which have the same id as those selected in Scatterplot 1
-      
+        var selectedIDs = svg1.selectAll(".selected").nodes().map((circle) => circle['id']);
+        myCircle2.classed("selected", (d) => selectedIDs.includes(d.id) )
     }
 
     //Is called when we brush on scatterplot #2
     function updateChart2(brushEvent) {
       extent = brushEvent.selection;
-      var selectedSpecies = new Set();
 
       //TODO: Check all the circles that are within the brush region in Scatterplot 2
-
+      myCircle2.classed("selected", function(d){ return isBrushed(extent, x2(d[xKey2]), y2(d[yKey2]) )}) ;
       //TODO: Select all the data points in Scatterplot 1 which have the same id as those selected in Scatterplot 2
-
+      var selectedIDs = svg2.selectAll(".selected").nodes().map((circle) => circle['id']);
+      myCircle1.classed("selected", (d) => selectedIDs.includes(d.id) );
       //TODO: Select bars in bar chart based on species selected in Scatterplot 2
-
+      var selectedSpecies = [... new Set(data.filter(d => selectedIDs.includes(d.id)).map(d => d.Species))];
+      myBar.classed("selected", d => selectedSpecies.includes(d.Species))
     }
 
     //Finds dots within the brushed region
