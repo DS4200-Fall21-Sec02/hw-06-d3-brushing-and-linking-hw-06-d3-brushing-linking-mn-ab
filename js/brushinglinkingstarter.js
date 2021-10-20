@@ -103,13 +103,18 @@ d3.csv("data/iris.csv").then((data) => {
 
     //TODO: Define a brush  
 
-     let brush1 = d3.brush()                     // Add the brush feature using the d3.brush function
-      .extent( [ [0,0], [width,height] ] )      // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
-      .on("start brush", (e, d) => updateChart1(e))
+     var brush1 = d3.brush()                     // Add the brush feature using the d3.brush function
+      .extent( [ [0,0], [width,height] ] )
+      .on('start',clear)      // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+      .on("brush", updateChart1)
+      
+      
 
     //TODO: Add brush to the svg  
     
-    svg1.call(brush1)
+    svg1
+    .call(brush1)
+    .attr('id','brush1');
 
     }
 
@@ -178,13 +183,18 @@ d3.csv("data/iris.csv").then((data) => {
 
     //TODO: Define a brush  
 
-    let brush2 = d3.brush()                     // Add the brush feature using the d3.brush function
-      .extent( [ [0,0], [width,height] ] )      // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
-      .on("start brush", (e, d) => updateChart2(e))
+    var brush2 = d3.brush()                     // Add the brush feature using the d3.brush function
+      .extent( [ [0,0], [width,height] ] )  
+      .on('start',clear)         // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+      .on("brush", updateChart2)
+      
+      
 
     //TODO: Add brush to the svg
 
-    svg2.call(brush2)
+    svg2
+    .call(brush2)
+    .attr('id','brush2');
     
     }
   
@@ -237,10 +247,11 @@ d3.csv("data/iris.csv").then((data) => {
     
   //Removes existing brushes from svg
     function clear() {
-        svg1.call(brush1.move, null);
-        svg2.call(brush2.move, null);
-    }
+      svg1.call(brush1.move, null);
+      svg2.call(brush2.move, null);
 
+    }
+    
     //Is called when we brush on scatterplot #1
     function updateChart1(brushEvent) {
         extent = brushEvent.selection;
@@ -251,6 +262,7 @@ d3.csv("data/iris.csv").then((data) => {
         //TODO: Select all the data points in Scatterplot 2 which have the same id as those selected in Scatterplot 1
         var selectedIDs = svg1.selectAll(".selected").nodes().map((circle) => circle['id']);
         myCircle2.classed("selected", (d) => selectedIDs.includes(d.id) )
+
     }
 
     //Is called when we brush on scatterplot #2
@@ -265,6 +277,7 @@ d3.csv("data/iris.csv").then((data) => {
       //TODO: Select bars in bar chart based on species selected in Scatterplot 2
       var selectedSpecies = [... new Set(data.filter(d => selectedIDs.includes(d.id)).map(d => d.Species))];
       myBar.classed("selected", d => selectedSpecies.includes(d.Species))
+
     }
 
     //Finds dots within the brushed region
